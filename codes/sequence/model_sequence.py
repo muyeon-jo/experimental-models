@@ -29,13 +29,16 @@ class recommendation_model(nn.Module):
 
         self.drop = nn.Dropout()
         self.cos = nn.CosineSimilarity(dim=-1)
+
+        self.dist_a = nn.Parameter()
+        self.dist_k = nn.Parameter()
         self._init_weight_()
 
     def _init_weight_(self):
-        nn.init.normal_(self.embed_history.weight, std=0.01)
-        nn.init.normal_(self.embed_target.weight, std=0.01)
-        nn.init.normal_(self.embed_ingoing.weight, std=0.01)
-        nn.init.normal_(self.embed_outgoing.weight, std=0.01)
+        nn.init.xavier_uniform_(self.embed_history.weight, std=0.01)
+        nn.init.xavier_uniform_(self.embed_target.weight, std=0.01)
+        nn.init.xavier_uniform_(self.embed_ingoing.weight, std=0.01)
+        nn.init.xavier_uniform_(self.embed_outgoing.weight, std=0.01)
         with torch.no_grad():
             self.embed_history.weight[self.item_num-1] = torch.zeros(self.int_embed_size)
             self.embed_target.weight[self.item_num-1] = torch.zeros(self.int_embed_size)
@@ -116,4 +119,3 @@ class recommendation_model(nn.Module):
         t3 = self.softmax(torch.bmm(q,k_out)/torch.sqrt(torch.tensor(self.geo_embed_size)))
         result_out = torch.bmm(t3,v_out).squeeze()
         return result_in, result_out
- 
